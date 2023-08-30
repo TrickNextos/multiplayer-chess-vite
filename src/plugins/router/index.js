@@ -13,18 +13,17 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/about.vue')
     },
     {
       path: '/auth/login',
       name: 'login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/auth/login.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: '404',
+      component: () => import('@/components/PageNotFound.vue')
     }
   ]
 })
@@ -41,7 +40,5 @@ router.beforeEach(async (to) => {
       return '/auth/login';
   }
 });
-const pageFiles = import.meta.glob('@/pages/*.vue');
-console.log(pageFiles)
 
 export default router
