@@ -1,11 +1,33 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
 
   font-weight: normal;
+}
+
+#chessboard {
+  background: url('img/chessboard-squares.png');
+  background-size: contain;
+  aspect-ratio: 1;
+  flex: 5;
+  overflow: hidden;
+
+  position: relative;
+}
+
+.chessboard-piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12.5%;
+  cursor: grab;
+}
+
+.chessboard-piece, .chessboard-piece div {
+  background-size: cover !important;
+  aspect-ratio: 1;
 }
 
 a,
@@ -21,15 +43,3 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-}
