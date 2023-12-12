@@ -4,7 +4,8 @@ import axios from '@/plugins/axios'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-      userId: localStorage.getItem('userId')
+      userId: localStorage.getItem('userId'),
+    token: localStorage.getItem('accessToken'),
   }),
 
   actions: {

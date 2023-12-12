@@ -1,11 +1,14 @@
 <template>
   <div v-if="moving_position" style="width: 100%; height: 100%; position: relative;" @mousemove="onMouseMove"
     @mouseup="onMouseUp" ref='chessboard_dimensions'>
-    <div class="chessboard-piece" @mousemove="onMouseMove" @mouseup="onMouseUp"
-      :style="{ background: getUrl(props.filename), transform: setPosition(moving_position), }" style="z-index: 5;" />
+    <div v-for='move in props.moves' class='chessboard-move'
+      :style="{ transform: setPosition([move[0] * 100, move[1] * 100]) }" />
+    <div class="chessboard-piece" @mousemove="onMouseMove"
+      :style="{ background: getUrl(props.filename + '.png'), transform: setPosition(moving_position), }"
+      style="z-index: 5;" />
   </div>
   <div v-else class="chessboard-piece" @mousedown="onMouseDown"
-    :style="{ background: getUrl(props.filename), transform: setPosition(props.position), }" />
+    :style="{ background: getUrl(props.filename + '.png'), transform: setPosition(props.position), }" />
 </template>
 
 <script setup>
@@ -13,6 +16,7 @@ import { ref } from 'vue'
 const props = defineProps({
   filename: String,
   position: Array,
+  moves: Array,
   chessboard_dimensions: {
     dimensions: Array,
     offset: Array,

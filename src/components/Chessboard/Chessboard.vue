@@ -2,7 +2,7 @@
   <div id='chessboard'>
     <ChessboardPiece v-for='piece in pieces' :filename='piece.filename'
       :position="[piece.position[0] * 100, piece.position[1] * 100]" :chessboard_dimensions='chessboard_dimensions'
-      @move="(new_pos) => $emit('move', piece.position, new_pos)" />
+      :moves='piece.moves' @move="(new_pos) => $emit('move', piece.position, new_pos)" />
 
   </div>
 </template>
