@@ -13,32 +13,44 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/about.vue')
     },
     {
       path: '/auth/login',
       name: 'login',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/auth/login.vue')
     },
     {
-      path: '/:pathMatch(.*)*',
-      name: '404',
-      component: () => import('@/components/PageNotFound.vue')
+      path: '/auth/register',
+      name: 'register',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/pages/auth/register.vue')
     }
   ]
 })
 
 router.beforeEach(async (to) => {
+  document.title = to.name;
+
   // redirect to login page if not logged in and trying to access a restricted page
-  const publicPages = ['/auth/login'];
+  const publicPages = ['/auth/login', '/auth/register'];
   const authRequired = !publicPages.includes(to.path);
   const auth = useAuthStore();
-  console.log(auth)
 
   if (authRequired && !auth.userId) {
       auth.returnUrl = to.fullPath;
       return '/auth/login';
   }
 });
+
+
 
 export default router

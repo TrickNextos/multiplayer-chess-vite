@@ -1,22 +1,27 @@
 <template>
-    <div>
-        <div>
-            <input type="text" v-model="username">
-            <input type="password" v-model="password">
-            <div @click="onSubmit()">
-                <span style="border-radius: 5px; background-color: gray;">
+    <div style="position: relative;">
+        <div class="login">
+            <div class="login-head">
+                <h1>Login</h1>
+            </div>
+            <div class="login-main">
+                <h4>Username:</h4>
+                <input type="text" v-model="username">
+                <h4>Password:</h4>
+                <input type="password" v-model="password">
+                <br><br>
+                <div class="btn-container">
+                    <div @click="onSubmit()" class="login-btn">
+                        <h3>Log in</h3>
+                    </div>
+                    <div @click="onRegister()" class="register">
+                        <h3>Register</h3>
+                    </div>
+                </div>
 
-                    submit
-                </span>
-            </div>
-            <div @click="auth.logout()">
-                logout
-            </div>
-            <div @click="test">
-                testing
             </div>
         </div>
-        {{ password }}
+
     </div>
 </template>
 
@@ -33,6 +38,10 @@ console.log("id:", auth.userId)
 
 let onSubmit = () => {
     auth.login(username.value, password.value)
+}
+
+let onRegister = () => {
+    window.location.pathname = '/auth/register'
 }
 
 let test = () => {
