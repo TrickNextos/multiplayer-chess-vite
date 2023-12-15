@@ -13,6 +13,20 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('userId')
       localStorage.removeItem('accessToken')
     },
+    async register(username, password) {
+      axios.post('auth/register', {
+        username: username,
+        password: password,
+      })
+      .then(login_resp => {
+        window.location.href = '/'
+        localStorage.setItem('userId', login_resp.data.id)
+        localStorage.setItem('accessToken', login_resp.data.access_token)
+      })
+      .catch(error => {
+
+      })
+    },
     async login(username, password) {
       axios.post('auth/login', {
         username: username,
