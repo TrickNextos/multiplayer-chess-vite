@@ -69,3 +69,11 @@
     background-color: #403e3c;
     font-weight: bold;
 }
+
+.error-text {
+    color: rgb(219, 64, 64);
+}
+
+.red-border {
+    border-color: red !important;
+}

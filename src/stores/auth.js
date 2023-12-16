@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('accessToken')
     },
     async register(username, password) {
-      axios.post('auth/register', {
+      return await axios.post('auth/register', {
         username: username,
         password: password,
       })
@@ -22,13 +22,38 @@ export const useAuthStore = defineStore('auth', {
         window.location.href = '/'
         localStorage.setItem('userId', login_resp.data.id)
         localStorage.setItem('accessToken', login_resp.data.access_token)
+        return {
+          error_username_reason: '',
+          error_password_reason: '',
+        }
       })
       .catch(error => {
+        if (error.code != "ERR_BAD_REQUEST") {
+          return {
+            error_username_reason: '',
+            error_password_reason: '',
+          }
+        }
 
+        let response = error.response.data
+        if (response.reason == "Bad password") {
+          return {
+            error_username_reason: '',
+            error_password_reason: response.description,
+          }
+          
+        }
+        else if (response.reason == "Bad username") {
+          console.log(response, response.description)
+          return {
+            error_username_reason: response.description,
+            error_password_reason: '',
+          }
+        }
       })
     },
     async login(username, password) {
-      axios.post('auth/login', {
+      return await axios.post('auth/login', {
         username: username,
         password: password
       })
@@ -36,9 +61,34 @@ export const useAuthStore = defineStore('auth', {
         window.location.href = '/'
         localStorage.setItem('userId', login_resp.data.id)
         localStorage.setItem('accessToken', login_resp.data.access_token)
+        return {
+          error_username_reason: '',
+          error_password_reason: '',
+        }
       })
       .catch(error => {
+        if (error.code != "ERR_BAD_REQUEST") {
+          return {
+            error_username_reason: '',
+            error_password_reason: '',
+          }
+        }
 
+        let response = error.response.data
+        if (response.reason == "Bad password") {
+          return {
+            error_username_reason: '',
+            error_password_reason: response.description,
+          }
+          
+        }
+        else if (response.reason == "Bad user") {
+          console.log(response, response.description)
+          return {
+            error_username_reason: response.description,
+            error_password_reason: '',
+          }
+        }
       })
 
     }

@@ -6,15 +6,14 @@
             </div>
             <div class="login-main">
                 <h4>Username:</h4>
-                <input type="text" v-model="username"><br>
+                <input :class="{'red-border': (error_username != '')}" type="text" v-model="username"><br>
                 <h4>Password:</h4>
-                <input type="password" v-model="password1">
+                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password1">
                 <h4>Repeat password:</h4>
-                <input type="password" v-model="password2">
+                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password2">
                 <br>
-                <p v-if="show_wrong_password">
-                    Passwords don't match
-                </p>
+                <p v-if="error_password" v-html="error_password" class="error-text" />
+                <p v-if="error_username" v-html="error_username" class="error-text" />
                 <br>
                 <div class="btn-container">
                     <div @click="onSubmit()" class="login-btn">
@@ -40,17 +39,21 @@ const username = ref('')
 const password1 = ref('')
 const password2 = ref('')
 
-const show_wrong_password = ref('')
+const error_password = ref('')
+const error_username = ref('')
 
 const auth = useAuthStore()
 
-let onSubmit = () => {
+let onSubmit = async () => {
     if (password1.value == password2.value) {
-        show_wrong_password.value = false
-        auth.register(username.value, password1.value)
+        const register_results = await auth.register(username.value, password1.value)
+
+        error_password.value = register_results.error_password_reason
+        error_username.value = register_results.error_username_reason
     }
     else {
-        show_wrong_password.value = true
+        error_password.value = "Passwords don't match"
+        error_username.value = ''
     }
 }
 
