@@ -2,14 +2,14 @@
   <div id='chessboard'>
     <ChessboardPiece v-for='piece in pieces' :filename='piece.filename'
       :position="[piece.position[0] * 100, piece.position[1] * 100]" :chessboard_dimensions='chessboard_dimensions'
-      :moves='piece.moves' @move="(new_pos) => $emit('move', piece.position, new_pos)" />
+      :moves='piece.moves' @move="(new_pos) => $emit('move', toRaw(piece.position), new_pos)" />
 
   </div>
 </template>
 
 <script setup>
 import ChessboardPiece from '@/components/Chessboard/ChessboardPiece.vue'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, toRaw } from 'vue';
 
 console.log('chessboard init')
 

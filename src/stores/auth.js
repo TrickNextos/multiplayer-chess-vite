@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       localStorage.removeItem('userId')
       localStorage.removeItem('accessToken')
+      window.location.href = '/auth/login'
     },
     async register(username, password) {
       return await axios.post('auth/register', {
@@ -50,6 +51,11 @@ export const useAuthStore = defineStore('auth', {
             error_password_reason: '',
           }
         }
+      })
+    },
+    async get_username() {
+      return await axios.get('auth/').then(data => {
+        return data.data.username
       })
     },
     async login(username, password) {

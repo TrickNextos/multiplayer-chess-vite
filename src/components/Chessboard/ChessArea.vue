@@ -9,7 +9,7 @@
           <div class="chess-chat-text"></div>
           <form class="chess-chat-input">
             <input type="text" name="" id="" class="typing" v-model="current_text">
-            <div class="text-submit" @click="send_text()">Send</div>
+            <div class="btn text-submit" @click="send_text()">Send</div>
           </form>
         </div>
       </div>
@@ -20,10 +20,12 @@
 <script setup>
 import Chessboard from '@/components/Chessboard/Chessboard.vue'
 import { useAuthStore } from '@/stores/auth'
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 
 function processMove(from_position, to_position) {
-  console.log(from_position, to_position)
+  if (JSON.stringify(from_position) == JSON.stringify(to_position)) {
+    return
+  }
   ws.send(JSON.stringify({
     action: 'move',
     data: JSON.stringify({

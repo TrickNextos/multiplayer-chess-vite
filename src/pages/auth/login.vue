@@ -53,10 +53,4 @@ let onSubmit = async () => {
 let onRegister = () => {
     window.location.pathname = '/auth/register'
 }
-
-let test = () => {
-    axios.get('/auth/test').then((resp) => {
-        console.log(resp)
-    })
-}
 </script>
