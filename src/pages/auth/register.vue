@@ -4,27 +4,24 @@
             <div class="login-head">
                 <h1>Register</h1>
             </div>
-            <div class="login-main">
-                <h4>Username:</h4>
-                <input :class="{'red-border': (error_username != '')}" type="text" v-model="username"><br>
-                <h4>Password:</h4>
-                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password1">
-                <h4>Repeat password:</h4>
-                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password2">
-                <br>
+            <form class="login-main" @submit="onSubmit">
+                <label for="username">Username</label><br>
+                <input :class="{'red-border': (error_username != '')}" id="username" type="text" v-model="username"><br>
+                <label for="password1">Password</label><br>
+                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password1"><br>
+                <label for="password2">Repeat password</label><br>
+                <input :class="{'red-border': (error_password != '')}" type="password" v-model="password2"><br>
                 <p v-if="error_password" v-html="error_password" class="error-text" />
                 <p v-if="error_username" v-html="error_username" class="error-text" />
                 <br>
                 <div class="btn-container">
-                    <div @click="onSubmit()" class="login-btn">
-                        <h3>Register</h3>
-                    </div>
+                    <input class="login-btn" type="submit" value="Register">
                     <div @click="moveToLogin()" class="register">
-                        <h3>Go to login</h3>
+                        Go to login
                     </div>
                 </div>
 
-            </div>
+            </form>
         </div>
 
     </div>
@@ -44,17 +41,19 @@ const error_username = ref('')
 
 const auth = useAuthStore()
 
-let onSubmit = async () => {
+function onSubmit(e) {
     if (password1.value == password2.value) {
-        const register_results = await auth.register(username.value, password1.value)
-
-        error_password.value = register_results.error_password_reason
-        error_username.value = register_results.error_username_reason
+        auth.register(username.value, password1.value).then((register_results) => {
+            error_password.value = register_results.error_password_reason
+            error_username.value = register_results.error_username_reason
+        })
     }
     else {
         error_password.value = "Passwords don't match"
         error_username.value = ''
     }
+
+    e.preventDefault()
 }
 
 let moveToLogin = () => {
