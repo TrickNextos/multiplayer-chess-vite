@@ -1,20 +1,27 @@
 @import './base.css';
+@import './helper.css';
 
 #app {
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
 
   font-weight: normal;
+  background-color: var(--color-background-soft)
 }
 
 #chessboard {
   background: url('img/chessboard-squares.png');
   background-size: contain;
   aspect-ratio: 1;
-  flex: 5;
-  overflow: hidden;
-
+  margin: auto;
   position: relative;
+
+  overflow: hidden;
+  flex: 5;
+  max-height: 85vmin;
+  max-width: 85vmin;
+
+  border-radius: 0.5em;
 }
 
 .chessboard-piece {
@@ -54,3 +61,66 @@ a,
   }
 }
 
+.chess-moves {
+  background-color: var(--color-background-mute);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5em;
+  flex: 3;
+  padding: 0.5em;
+}
+
+.chess-chat{
+  background-color: var(--color-background-mute);
+  flex: 2;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5em;
+  display: flex;
+  flex-direction: column;
+}
+
+.chess-chat-text {
+  flex: 5;
+  padding: 0.5em;
+}
+
+.chess-chat-input {
+  flex: 1;
+  display: flex;
+  width: fit-content;
+  width: 100%;
+  background-color: var(--color-background-mute);
+  border-top: 1px solid var(--color-border-hover) !important;
+  border: 0 solid;
+  border-radius: 0 0 0.5em 0.5em;
+  position: relative;
+}
+
+.chess-chat-input > input.typing {
+  flex: 1;
+  width: 100;
+  border-radius: 0 0 0.5em 0.5em;
+  background-color: var(--color-background-mute);
+  border-top: 1px solid var(--color-border-hover) !important;
+  border: 0 solid;
+  margin: 0;
+  padding: 0.8em;
+  color: white;
+  font-size: 1.2em;
+}
+
+.chess-chat-input > input.typing:focus {
+  outline: 1px solid white;
+}
+
+.chess-chat-input > .text-submit {
+  user-select: none;
+  color: white;
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translate(0, -50%);
+  background-color: var(--color-green);
+  border: 0px solid;
+  padding: 0.5em 1em;
+  border-radius: 1em;
+}

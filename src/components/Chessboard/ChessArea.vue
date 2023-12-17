@@ -1,11 +1,20 @@
 <template>
-  <div class='main-area' :id="index">
-    <Chessboard :pieces="pieces" @move='processMove' />
-    <div style="flex: 1;">
-      Testing window
+  <div style="overflow-y: hidden;">
+    <div class='main-area' :id="index">
+      <Chessboard :pieces="pieces" @move='processMove' />
+      <div class="side-bar">
+        <div class="chess-moves">
+        </div>
+        <div class="chess-chat">
+          <div class="chess-chat-text"></div>
+          <form class="chess-chat-input">
+            <input type="text" name="" id="" class="typing" v-model="current_text">
+            <div class="text-submit" @click="send_text()">Send</div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
-  {{ pieces }}
 </template>
 
 <script setup>
@@ -24,6 +33,13 @@ function processMove(from_position, to_position) {
   }))
 
 }
+
+let current_text = ref('')
+let send_text = () => {
+  console.log(current_text.value)
+  current_text.value = ''
+}
+
 let index = 0
 console.log("happens i guess")
 
@@ -52,9 +68,18 @@ let pieces = ref([
 
 <style>
 .main-area {
+  padding: 2.5vh;
   display: flex;
+  justify-content: end;
   gap: 1em;
-  width: 80%;
   margin: 0 auto;
+  height: 90vh;
+  }
+.side-bar {
+  max-width: 30vw;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 </style>

@@ -19,7 +19,7 @@ const props = defineProps({
 
 const chessboard_dimensions = ref(null)
 
-onMounted(() => {
+function getChessboardDimensions() {
   let chessboard = document.getElementById('chessboard')
   chessboard_dimensions.value = {
     dimensions: [
@@ -31,6 +31,11 @@ onMounted(() => {
       chessboard.offsetTop,
     ]
   }
+}
+
+onMounted(() => {
+  getChessboardDimensions()
+  window.addEventListener("resize", getChessboardDimensions)
 })
 
 </script>
