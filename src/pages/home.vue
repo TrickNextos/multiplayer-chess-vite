@@ -6,10 +6,22 @@
   </div>
   <div class="d-flex w-100">
     <div class="menu">
-      Games: 
+      <div class="d-flex" style="gap: 1em; align-items: center;">
+        <h3>Games: </h3>
+        <div class="btn" @click="chessArea.new_game(null)">New</div>
+      </div>
+      <div v-for="game_info in game_names" @click="chessArea.switch_game(game_info.id)">
+        {{ game_info.username }}
+      </div>
     </div>
     <main style="flex: 1;">
-      <ChessArea class="w-100"/>
+      <ChessArea class="w-100" ref="chessArea" @new_game="(i, u) => {
+        console.log('in emit get',i, u)
+        game_names.push({
+          id: i,
+          username: u,
+        })
+      }"/>
     </main>
   </div>
 </template>
@@ -21,6 +33,10 @@ import { useAuthStore } from '../stores/auth';
 
 const auth = useAuthStore()
 const username = ref('')
+
+const game_names = ref([])
+const chessArea = ref(null)
+
 
 onMounted(async () => {
   username.value = await auth.get_username()

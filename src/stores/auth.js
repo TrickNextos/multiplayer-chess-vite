@@ -5,13 +5,11 @@ import axios from '@/plugins/axios'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
       userId: localStorage.getItem('userId'),
-    token: localStorage.getItem('accessToken'),
   }),
 
   actions: {
     logout() {
       localStorage.removeItem('userId')
-      localStorage.removeItem('accessToken')
       window.location.href = '/auth/login'
     },
     async register(username, password) {
@@ -22,7 +20,6 @@ export const useAuthStore = defineStore('auth', {
       .then(login_resp => {
         window.location.href = '/'
         localStorage.setItem('userId', login_resp.data.id)
-        localStorage.setItem('accessToken', login_resp.data.access_token)
         return {
           error_username_reason: '',
           error_password_reason: '',
@@ -66,7 +63,6 @@ export const useAuthStore = defineStore('auth', {
       .then(login_resp => {
         window.location.href = '/'
         localStorage.setItem('userId', login_resp.data.id)
-        localStorage.setItem('accessToken', login_resp.data.access_token)
         return {
           error_username_reason: '',
           error_password_reason: '',
