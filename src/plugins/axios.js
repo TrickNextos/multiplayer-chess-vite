@@ -5,7 +5,5 @@ let axiosCustom = axios.create({
     withCredentials: true,
   })
 
-axiosCustom.defaults.headers.common['Authorization'] =
-  localStorage.getItem('accessToken')
 
 export default axiosCustom

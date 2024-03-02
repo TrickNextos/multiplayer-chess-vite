@@ -1,24 +1,36 @@
 <template>
+
+  <div class="header d-flex">
+    <h3>Welcome {{username}}</h3>
+    <div class="btn" @click="auth.logout()">Logout</div>
+  </div>
+  woow
   <div class="about">
     <h1>This is an about page</h1>
     <hr>
     {{ neki }}
-    <div @click="onClick()">
-      test
-    </div>
+    {{ info }}
   </div>
 </template>
 
 <script setup>
 import { useAuthStore } from '@/stores/auth'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import axios from '@/plugins/axios';
 let auth = useAuthStore()
 
-let neki = ref(auth.user)
+const username = ref('')
 
-let onClick = () => {
-  auth.logout()
-}
+let neki = ref(auth.user)
+let info = ref('')
+
+onMounted(async () => {
+  username.value = await auth.get_username()
+  await axios.get('social').then(resp => {
+    info.value = resp.data
+  })
+})
+
 </script>
 
 <style>

@@ -1,5 +1,4 @@
 <template>
-  <div class="overflow-y-hidden"></div>
   <div class="header d-flex">
     <h3>Welcome {{username}}</h3>
     <div class="btn" @click="useAuthStore().logout()">Logout</div>
@@ -11,7 +10,9 @@
         <div class="btn" @click="chessArea.new_game(null)">New</div>
       </div>
       <div v-for="game_info in game_names" @click="chessArea.switch_game(game_info.id)">
-        {{ game_info.username }}
+        <div :class="{'chosen_game': chessArea.get_current_game() == game_info.id}" style="padding-left: 0.5em; border-left: rgba(0,0,0,0) 5px solid;">
+          {{ game_info.username }}
+        </div>
       </div>
     </div>
     <main style="flex: 1;">
@@ -61,5 +62,9 @@ onMounted(async () => {
   align-items: center;
   padding: 0 2em ;
 
+}
+
+.chosen_game {
+  border-left: var(--color-green) 5px solid !important;
 }
 </style>

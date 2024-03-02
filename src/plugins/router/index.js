@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Test from '@/pages/home.vue'
+import Home from '@/pages/home.vue'
 import { useAuthStore } from '@/stores/auth'
+import axios from '@/plugins/axios'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Test
+      component: Home
     },
     {
       path: '/about',
@@ -44,8 +45,13 @@ router.beforeEach(async (to) => {
   const publicPages = ['/auth/login', '/auth/register'];
   const authRequired = !publicPages.includes(to.path);
   const auth = useAuthStore();
+  const isAuth = await axios.get('auth/').then(resp => {
+    return resp.status == 200
+  }).catch(_err => {
+    return false
+  })
 
-  if (authRequired && !auth.userId) {
+  if (authRequired && !isAuth) {
       auth.returnUrl = to.fullPath;
       return '/auth/login';
   }

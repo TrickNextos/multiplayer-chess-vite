@@ -9,7 +9,6 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     logout() {
-      localStorage.removeItem('userId')
       window.location.href = '/auth/login'
     },
     async register(username, password) {
@@ -51,8 +50,10 @@ export const useAuthStore = defineStore('auth', {
       })
     },
     async get_username() {
-      return await axios.get('auth/').then(data => {
+      return axios.get('auth/').then(data => {
         return data.data.username
+      }).catch(err => {
+        return "Guest"
       })
     },
     async login(username, password) {
@@ -95,11 +96,5 @@ export const useAuthStore = defineStore('auth', {
 
     }
   },
-
-  getters: {
-    is_auth: (state) => {
-      return state.userId ? true : false;
-    }
-  }
 
 })

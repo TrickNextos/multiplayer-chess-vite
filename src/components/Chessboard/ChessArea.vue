@@ -22,7 +22,7 @@
               </td>
             </tr>
           </table>
-          </div>
+        </div>
         <div class="chess-chat">
           <div class="chess-chat-text scrollable">
             <p v-if="current_game" v-for="chat in games[current_game].chat" v-html="chat" />
@@ -34,14 +34,13 @@
         </div>
       </div>
     </div>
-    {{ games }}
   </div>
 </template>
 
 <script setup>
 import Chessboard from '@/components/Chessboard/Chessboard.vue'
 import { useAuthStore } from '@/stores/auth'
-import { ref, defineExpose, defineEmits } from 'vue'
+import { ref, defineEmits } from 'vue'
 
 const emit = defineEmits(['new_game'])
 
@@ -56,7 +55,7 @@ function processMove(from_position, to_position) {
     data: JSON.stringify({
       from: from_position,
       to: to_position,
-    }), 
+    }),
   }))
 
 }
@@ -74,7 +73,7 @@ function send_text(e) {
       data: current_text.value,
     }))
     console.log(games.value[current_game.value].chat)
-    games.value[current_game.value].chat.splice(0, 0,'<b>Me: </b>' + current_text.value)
+    add_to_chat("Me", current_text.value, current_game.value)
     current_text.value = ''
   }
 
@@ -90,15 +89,17 @@ function new_game(e) {
   }))
   console.log('send form data')
 
-  if (e) { 
+  if (e) {
     e.preventDefault()
   }
 }
 function switch_game(game_id) {
-  console.log(game_id)
   current_game.value = game_id
 }
-defineExpose({new_game, switch_game})
+function get_current_game() {
+  return current_game.value
+}
+defineExpose({ new_game, switch_game, get_current_game })
 
 
 let index = 0
@@ -115,37 +116,54 @@ ws.onmessage = (msg) => {
   if (data.action == 'move') {
     // games.value[data.game_id].pieces = JSON.parse(data.data)
     games.value[data.game_id].pieces = data.data
-    
+
     index += 1
   }
   else if (data.action == 'chat') {
     console.log(games.value[data.game_id].chat)
-    games.value[data.game_id].chat.splice(0, 0, '<b>Opponent: </b> ' + data.data)
+    add_to_chat("Opponent", data.data, data.game_id)
   }
   else if (data.action == 'move info') {
-    let move_length = games.value[data.game_id].moves.length
-    let last_move_pair = games.value[data.game_id].moves[move_length - 1]
-
-    if (last_move_pair.length == 1) {
-      last_move_pair.push(data.data)
-    }
-    else {
-      games.value[data.game_id].moves.push([data.data])
-    }
+    add_to_moves(data.data, data.game_id)
   }
   else if (data.action == 'init') {
     console.log('init happens')
+    console.log(data.data)
     games.value[data.game_id] = {
       pieces: undefined,
       chat: [],
-      moves: [[]],
-      username: data.data.username,
+      moves: [[]], // moves will be added a bit later
+      username: data.data.opponent.username,
     }
     console.log('data.game_id in ws', data.game_id)
-    emit('new_game', data.game_id, data.data.username)
+    emit('new_game', data.game_id, data.data.opponent.username)
     current_game.value = data.game_id
+
+    for (let i = 0; i < data.data.moves.length; i++) {
+      add_to_moves(data.data.moves[i], data.game_id)
+    }
+    for (let i = 0; i < data.data.chat.length; i++) {
+      let player = data.data.chat[i][0] ? "Me" : "Opponent"
+      add_to_chat(player, data.data.chat[i][1], data.game_id)
+    }
+
     index += 1
   }
+}
+
+function add_to_moves(move, game_id) {
+  let move_length = games.value[game_id].moves.length
+  let last_move_pair = games.value[game_id].moves[move_length - 1]
+
+  if (last_move_pair.length == 1) {
+    last_move_pair.push(move)
+  }
+  else {
+    games.value[game_id].moves.push([move])
+  }
+}
+function add_to_chat(player, chat, game_id) {
+  games.value[game_id].chat.splice(0, 0, '<b>' + player + ': </b> ' + chat)
 }
 </script>
 
@@ -157,7 +175,8 @@ ws.onmessage = (msg) => {
   gap: 1em;
   margin: 0 auto;
   height: 90vh;
-  }
+}
+
 .side-bar {
   max-width: 30vw;
   flex: 1;
