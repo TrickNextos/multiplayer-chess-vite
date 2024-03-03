@@ -2,10 +2,9 @@
   <div style="overflow-y: hidden;">
     <div class='main-area' :id="index">
       <div v-if="!Object.keys(games).length" style="flex: 1; display: relative;">
-        {{ Object.keys(games).length }}
-        <form @submit="new_game">
-          <input type="submit" value="Send">
-        </form>
+        <NewGameModal 
+          :ws="ws"
+        />
       </div>
       <Chessboard v-else-if="games[current_game] != undefined" :pieces="games[current_game].pieces" @move='processMove' />
       <div v-else style="flex: 1;">wrong game selected</div>
@@ -37,12 +36,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Chessboard from '@/components/Chessboard/Chessboard.vue'
-import { useAuthStore } from '@/stores/auth'
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
+import NewGameModal from '@/components/modals/NewGameModal.vue'
 
 const emit = defineEmits(['new_game'])
+
+const { ws } = defineProps<{
+    ws: WebSocket
+}>()
 
 
 function processMove(from_position, to_position) {
@@ -80,34 +83,17 @@ function send_text(e) {
   e.preventDefault()
 }
 
-function new_game(e) {
-  console.log("wow")
-  ws.send(JSON.stringify({
-    game_id: null,
-    action: 'new_game',
-    data: 'not there yet :)',
-  }))
-  console.log('send form data')
 
-  if (e) {
-    e.preventDefault()
-  }
-}
 function switch_game(game_id) {
   current_game.value = game_id
 }
 function get_current_game() {
   return current_game.value
 }
-defineExpose({ new_game, switch_game, get_current_game })
+defineExpose({ switch_game, get_current_game })
 
 
 let index = 0
-console.log("happens i guess")
-
-let auth_store = useAuthStore()
-const ws = new WebSocket('ws://localhost:5678/game/ws/' + auth_store.userId)
-//const ws = new WebSocket('ws://localhost:5678/game/ws')
 
 ws.onmessage = (msg) => {
   console.log("Got message from ws: ", msg)
