@@ -1,12 +1,11 @@
 <template>
   <div style="overflow-y: hidden;">
-    <div class='main-area' :id="index">
-      <div v-if="!Object.keys(games).length" style="flex: 1; display: relative;">
-        <NewGameModal 
-          :ws="ws"
-        />
+    <div class='main-area'>
+      <div v-if="!Object.keys(games).length" style="flex: 1; position: relative;">
+        <div class="btn center-absolute" @click="() => openModal(NewGameModal, { ws: ws })">New game</div>
       </div>
-      <Chessboard v-else-if="games[current_game] != undefined" :pieces="games[current_game].pieces" @move='processMove' />
+      <Chessboard v-else-if="games[current_game] != undefined" :pieces="games[current_game].pieces"
+        @move='processMove' />
       <div v-else style="flex: 1;">wrong game selected</div>
       <div class="side-bar">
         <div class="chess-moves scrollable">
@@ -15,8 +14,8 @@
               <th>White</th>
               <th>Black</th>
             </tr>
-            <tr v-if="games[current_game]" v-for="chess_move in games[current_game].moves">
-              <td v-for="move in chess_move" style="text-align: center; height: fit-content;">
+            <tr v-if="games[current_game]" :key="chess_move" v-for="chess_move in games[current_game].moves">
+              <td v-for="move in chess_move" :key="move" style="text-align: center; height: fit-content;">
                 {{ move }}
               </td>
             </tr>
@@ -24,9 +23,9 @@
         </div>
         <div class="chess-chat">
           <div class="chess-chat-text scrollable">
-            <p v-if="current_game" v-for="chat in games[current_game].chat" v-html="chat" />
+            <p v-if="current_game" :key="chat" v-for="chat in games[current_game].chat" v-html="chat" />
           </div>
-          <form class="chess-chat-input" @submit="send_text">
+          <form class="chess-chat-input" @submit.prevent="send_text">
             <input type="text" name="" id="" class="typing" v-model="current_text">
             <input class="btn text-submit" value="Send" type="submit">
           </form>
@@ -37,18 +36,23 @@
 </template>
 
 <script setup lang="ts">
-import Chessboard from '@/components/Chessboard/Chessboard.vue'
+import Chessboard from './Chessboard.vue'
 import { ref } from 'vue'
-import NewGameModal from '@/components/modals/NewGameModal.vue'
+import NewGameModal from '../modals/NewGameModal.vue'
+import { useNotificationStore } from '../../stores/notification';
+import { openModal } from 'jenesius-vue-modal';
 
 const emit = defineEmits(['new_game'])
+let notification_store = useNotificationStore()
+
+let selected = ref('')
 
 const { ws } = defineProps<{
-    ws: WebSocket
+  ws: WebSocket
 }>()
 
 
-function processMove(from_position, to_position) {
+function processMove(from_position: [number, number], to_position: [number, number]) {
   if (JSON.stringify(from_position) == JSON.stringify(to_position)) {
     return
   }
@@ -68,7 +72,7 @@ let current_game = ref(null)
 let games = ref(new Object)
 
 let current_text = ref('')
-function send_text(e) {
+function send_text() {
   if (current_text.value != '') {
     ws.send(JSON.stringify({
       game_id: current_game.value,
@@ -79,8 +83,6 @@ function send_text(e) {
     add_to_chat("Me", current_text.value, current_game.value)
     current_text.value = ''
   }
-
-  e.preventDefault()
 }
 
 
@@ -113,8 +115,9 @@ ws.onmessage = (msg) => {
     add_to_moves(data.data, data.game_id)
   }
   else if (data.action == 'init') {
-    console.log('init happens')
-    console.log(data.data)
+    if (data.data.new_game) {
+      notification_store.success("New game with " + data.data.opponent.username + " started")
+    }
     games.value[data.game_id] = {
       pieces: undefined,
       chat: [],

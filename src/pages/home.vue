@@ -7,7 +7,10 @@
     <div class="menu">
       <div class="d-flex" style="gap: 1em; align-items: center;">
         <h3>Games: </h3>
-        <NewGameModal :ws="ws"/>
+        <!-- <NewGameModal :ws="ws"/> -->
+        
+        <div class="btn" @click="() => openModal(NewGameModal, {ws})">New Game</div>
+
       </div>
       <div v-for="game_info in game_names" @click="chessArea.switch_game(game_info.id)">
         <div :class="{'chosen_game': chessArea.get_current_game() == game_info.id}" style="padding-left: 0.5em; border-left: rgba(0,0,0,0) 5px solid;">
@@ -32,6 +35,7 @@ import ChessArea from '@/components/Chessboard/ChessArea.vue'
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../stores/auth';
 import NewGameModal from '../components/modals/NewGameModal.vue';
+import { openModal } from 'jenesius-vue-modal';
 
 const auth = useAuthStore()
 const username = ref('')
@@ -44,6 +48,15 @@ const ws = new WebSocket('ws://localhost:5678/game/ws/' + auth.userId)
 onMounted(async () => {
   username.value = await auth.get_username()
 })
+
+function new_game(data) {
+  ws.send(JSON.stringify({
+    game_id: null,
+    action: 'new_game',
+    data: "wow",
+  }))
+  console.log('send form data')
+}
 
 </script>
 

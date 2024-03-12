@@ -1,12 +1,14 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import ModalBase from '@/plugins/modal/ModalBase.vue'
+
+import {container} from "jenesius-vue-modal";
 </script>
 
 <template>
   <div style="width: 100%;">
     <RouterView />
-    <ModalBase />
+    
+    <container />
   </div>
 </template>
 
