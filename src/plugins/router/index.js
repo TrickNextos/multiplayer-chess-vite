@@ -8,14 +8,14 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Home',
       component: Home
     },
     {
       path: '/about',
       name: 'about',
       // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
+     // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/about.vue')
     },
@@ -34,6 +34,11 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('@/pages/auth/register.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'Page not found',
+      component: () => import('@/components/PageNotFound.vue')
     }
   ]
 })
@@ -56,7 +61,5 @@ router.beforeEach(async (to) => {
       return '/auth/login';
   }
 });
-
-
 
 export default router

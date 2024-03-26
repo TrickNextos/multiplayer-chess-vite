@@ -20,6 +20,11 @@
             <option disabled value="">Choose a player</option>
             <option v-for="friend in friends" :key="friend" :value="friend.id">{{ friend.username }}</option>
           </select>
+          <!-- <br> -->
+          <!-- <br> -->
+          <!-- <span class="btn" @click="() => openModal(FriendsModal)"> -->
+          <!--   View friend settings -->
+          <!-- </span> -->
 
           <br><br>
           <input type="submit" class="btn" value="Play now" :disabled="!friend_id" @click="() => {
@@ -40,8 +45,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { popModal } from 'jenesius-vue-modal';
+import { popModal, openModal } from 'jenesius-vue-modal';
 import axios from '../../plugins/axios';
+import FriendsModal from '../modals/FriendsModal.vue'
 
 const props = defineProps<{
   ws: WebSocket
@@ -62,8 +68,6 @@ function new_game(data: object) {
   console.log('send form data')
 }
 
-let resp = axios.post('social/', { id: 3 }).catch(() => { })
-console.log(resp)
 
 onMounted(async () => {
   friends.value = await axios.get('social/').then(resp => {

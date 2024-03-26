@@ -1,6 +1,12 @@
 <template>
   <div class="header d-flex">
-    <h3>Hello {{username}}</h3>
+    <div class="header-left d-flex">
+      <h3>Hello {{ username }}</h3>
+      <div class="d-flex" style="gap: 1em">
+        <div @click="() => openModal(FriendsModal)">Friends</div>
+        <div @click="() => openModal(InboxModal, { ws })">Inbox</div>
+      </div>
+    </div>
     <div class="btn" @click="useAuthStore().logout()">Logout</div>
   </div>
   <div class="d-flex w-100">
@@ -8,24 +14,25 @@
       <div class="d-flex" style="gap: 1em; align-items: center;">
         <h3>Games: </h3>
         <!-- <NewGameModal :ws="ws"/> -->
-        
-        <div class="btn" @click="() => openModal(NewGameModal, {ws})">New Game</div>
+
+        <div class="btn" @click="() => openModal(NewGameModal, { ws })">New Game</div>
 
       </div>
       <div v-for="game_info in game_names" @click="chessArea.switch_game(game_info.id)">
-        <div :class="{'chosen_game': chessArea.get_current_game() == game_info.id}" style="padding-left: 0.5em; border-left: rgba(0,0,0,0) 5px solid;">
+        <div :class="{ 'chosen_game': chessArea.get_current_game() == game_info.id }"
+          style="padding-left: 0.5em; border-left: rgba(0,0,0,0) 5px solid;">
           {{ game_info.username }}
         </div>
       </div>
     </div>
     <main style="flex: 1;">
       <ChessArea :ws="ws" class="w-100" ref="chessArea" @new_game="(i, u) => {
-        console.log('in emit get',i, u)
+        console.log('in emit get', i, u)
         game_names.push({
           id: i,
           username: u,
         })
-      }"/>
+      }" />
     </main>
   </div>
 </template>
@@ -36,6 +43,8 @@ import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../stores/auth';
 import NewGameModal from '../components/modals/NewGameModal.vue';
 import { openModal } from 'jenesius-vue-modal';
+import FriendsModal from '../components/modals/FriendsModal.vue'
+import InboxModal from '../components/modals/InboxModal.vue';
 
 const auth = useAuthStore()
 const username = ref('')
@@ -75,11 +84,16 @@ function new_game(data) {
   height: 10vh;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2em ;
+  padding: 0 2em;
 
 }
 
 .chosen_game {
   border-left: var(--color-green) 5px solid !important;
+}
+
+.header-left {
+  gap: 3em;
+  align-items: baseline;
 }
 </style>

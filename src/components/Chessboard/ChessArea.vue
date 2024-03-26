@@ -41,6 +41,7 @@ import { ref } from 'vue'
 import NewGameModal from '../modals/NewGameModal.vue'
 import { useNotificationStore } from '../../stores/notification';
 import { openModal } from 'jenesius-vue-modal';
+import { useInboxStore } from '../../stores/inbox.ts'
 
 const emit = defineEmits(['new_game'])
 let notification_store = useNotificationStore()
@@ -97,6 +98,8 @@ defineExpose({ switch_game, get_current_game })
 
 let index = 0
 
+const inboxStore = useInboxStore()
+
 ws.onmessage = (msg) => {
   console.log("Got message from ws: ", msg)
   let data = JSON.parse(msg.data);
@@ -137,6 +140,13 @@ ws.onmessage = (msg) => {
     }
 
     index += 1
+  }
+  else if (data.action == 'friend request') {
+    inboxStore.friendRequests.push(data.data)
+    console.log(inboxStore.friendRequests)
+  }
+  else {
+    console.log("wrong ws message action")
   }
 }
 
