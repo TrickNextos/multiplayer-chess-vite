@@ -30,6 +30,24 @@
             <input class="btn text-submit" value="Send" type="submit">
           </form>
         </div>
+        <div class="chess-control" v-if="current_game">
+          <div @click="end_game('Resign')">
+            Resign
+          </div>
+
+          <div v-if="games[current_game].ask_draw == undefined" @click="end_game('DrawAsk')">
+            Draw
+          </div>
+          <div v-else-if="games[current_game].ask_draw == false">
+            Already sent draw request
+          </div>
+          <div v-if="games[current_game].ask_draw == true" @click="end_game('DrawConfirm')">
+            Confirm draw
+          </div>
+          <div v-if="games[current_game].ask_draw == true" @click="end_game('DrawCancel')">
+            Reject draw
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -60,10 +78,10 @@ function processMove(from_position: [number, number], to_position: [number, numb
   ws.send(JSON.stringify({
     game_id: current_game.value,
     action: 'move',
-    data: JSON.stringify({
+    data: {
       from: from_position,
       to: to_position,
-    }),
+    },
   }))
 
 }
@@ -123,10 +141,12 @@ ws.onmessage = (msg) => {
     }
     games.value[data.game_id] = {
       pieces: undefined,
-      chat: [],
+      chat: [],  // chat will be added a bit later
       moves: [[]], // moves will be added a bit later
       username: data.data.opponent.username,
+      ask_draw: data.data.ask_draw,
     }
+    console.log(data.data)
     console.log('data.game_id in ws', data.game_id)
     emit('new_game', data.game_id, data.data.opponent.username)
     current_game.value = data.game_id
@@ -145,9 +165,42 @@ ws.onmessage = (msg) => {
     inboxStore.friendRequests.push(data.data)
     console.log(inboxStore.friendRequests)
   }
+  else if (data.action == 'end') {
+    // TODO: Add popup when game ends
+    if (data.data.type == 'resign') {
+      console.log("opponent resigned")
+    }
+    else if (data.data.type == 'draw-ask') {
+      console.log("draw ask")
+      games.value[current_game.value].ask_draw = data.data.data
+    }
+    else if (data.data.type == 'draw-confirm') {
+      console.log("draw confirm")
+      games.value[current_game.value].ask_draw = undefined
+    }
+    else if (data.data.type == 'draw-cancel') {
+      console.log("draw cancel")
+      games.value[current_game.value].ask_draw = undefined
+    }
+    else if (data.data.type == 'checkmate') {
+      console.log("win")
+    }
+  }
   else {
     console.log("wrong ws message action")
   }
+}
+
+function end_game(type: string) {
+  if (!current_game.value) {
+    return
+  }
+
+  ws.send(JSON.stringify({
+    game_id: current_game.value,
+    action: "end",
+    data: type,
+  }))
 }
 
 function add_to_moves(move, game_id) {
@@ -182,5 +235,27 @@ function add_to_chat(player, chat, game_id) {
   display: flex;
   flex-direction: column;
   gap: 1em;
+}
+
+.chess-control {
+  display: flex;
+  gap: min(1em, 2%);
+}
+
+.chess-control>* {
+  border: 1px solid var(--color-border);
+  border-radius: 1em;
+  padding: 1em;
+  background-color: var(--color-background-mute);
+  flex: 1;
+  text-align: center;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+}
+
+.chess-control>*:hover {
+  border-color: var(--color-border-hover);
 }
 </style>
