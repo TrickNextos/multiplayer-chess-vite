@@ -15,7 +15,7 @@
         <h3>Games: </h3>
         <!-- <NewGameModal :ws="ws"/> -->
 
-        <div class="btn" @click="() => openModal(NewGameModal, { ws })">New Game</div>
+        <div class="btn" @click="() => openModal(NewGameModal, { ws, new_game })">New Game</div>
 
       </div>
       <div v-for="game_info in game_names" @click="chessArea.switch_game(game_info.id)">
@@ -26,7 +26,7 @@
       </div>
     </div>
     <main style="flex: 1;">
-      <ChessArea :ws="ws" class="w-100" ref="chessArea" @new_game="(i, u) => {
+      <ChessArea :ws="ws" :new_game_func="new_game" class="w-100" ref="chessArea" @new_game="(i, u) => {
         console.log('in emit get', i, u)
         game_names.push({
           id: i,
@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ChessArea from '@/components/Chessboard/ChessArea.vue'
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '../stores/auth';
@@ -45,6 +45,7 @@ import NewGameModal from '../components/modals/NewGameModal.vue';
 import { openModal } from 'jenesius-vue-modal';
 import FriendsModal from '../components/modals/FriendsModal.vue'
 import InboxModal from '../components/modals/InboxModal.vue';
+import { GameOptions } from '../interfaces.ts'
 
 const auth = useAuthStore()
 const username = ref('')
@@ -58,11 +59,11 @@ onMounted(async () => {
   username.value = await auth.get_username()
 })
 
-function new_game(data) {
+function new_game(game_options: GameOptions) {
   ws.send(JSON.stringify({
     game_id: null,
     action: 'new_game',
-    data: "wow",
+    data: game_options,
   }))
   console.log('send form data')
 }

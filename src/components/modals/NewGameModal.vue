@@ -8,8 +8,8 @@
           <h3>Play with random people around the world</h3>
           <br>
           <input type="submit" class="btn" value="Play now" @click="() => {
-      new_game({
-        type: 'multiplayer',
+      props.new_game({
+        game_type: 'Multiplayer',
       })
       popModal()
     }">
@@ -31,9 +31,9 @@
       if (!friend_id) {
         return
       }
-      new_game({
-        type: 'multiplayer',
-        friend: friend_id,
+      props.new_game({
+        game_type: 'Multiplayer',
+        opponent: friend_id,
       })
       popModal()
     }">
@@ -50,7 +50,8 @@ import axios from '../../plugins/axios';
 import FriendsModal from '../modals/FriendsModal.vue'
 
 const props = defineProps<{
-  ws: WebSocket
+  ws: WebSocket,
+  new_game: (game_options: GameOptions) => void,
 }>()
 
 console.log(props)
@@ -59,17 +60,8 @@ const friends = ref(undefined)
 const friend_id = ref('')
 
 
-function new_game(data: object) {
-  props.ws.send(JSON.stringify({
-    game_id: null,
-    action: 'new_game',
-    data: "wow",
-  }))
-  console.log('send form data')
-}
-
-
 onMounted(async () => {
+  console.log(props)
   friends.value = await axios.get('social/').then(resp => {
     console.log(resp)
     return resp.data.info

@@ -2,7 +2,9 @@
   <div style="overflow-y: hidden;">
     <div class='main-area'>
       <div v-if="!Object.keys(games).length" style="flex: 1; position: relative;">
-        <div class="btn center-absolute" @click="() => openModal(NewGameModal, { ws: ws })">New game</div>
+        <div class="btn center-absolute"
+          @click="() => openModal(NewGameModal, { ws: props.ws, new_game: props.new_game })">New
+          game</div>
       </div>
       <Chessboard v-else-if="games[current_game] != undefined" :pieces="games[current_game].pieces"
         @move='processMove' />
@@ -66,8 +68,9 @@ let notification_store = useNotificationStore()
 
 let selected = ref('')
 
-const { ws } = defineProps<{
-  ws: WebSocket
+const props = defineProps<{
+  ws: WebSocket,
+  new_game: (game_options: GameOptions) => void,
 }>()
 
 
@@ -75,7 +78,7 @@ function processMove(from_position: [number, number], to_position: [number, numb
   if (JSON.stringify(from_position) == JSON.stringify(to_position)) {
     return
   }
-  ws.send(JSON.stringify({
+  props.ws.send(JSON.stringify({
     game_id: current_game.value,
     action: 'move',
     data: {
@@ -93,7 +96,7 @@ let games = ref(new Object)
 let current_text = ref('')
 function send_text() {
   if (current_text.value != '') {
-    ws.send(JSON.stringify({
+    props.ws.send(JSON.stringify({
       game_id: current_game.value,
       action: 'chat',
       data: current_text.value,
@@ -118,7 +121,7 @@ let index = 0
 
 const inboxStore = useInboxStore()
 
-ws.onmessage = (msg) => {
+props.ws.onmessage = (msg) => {
   console.log("Got message from ws: ", msg)
   let data = JSON.parse(msg.data);
   console.log(data)
