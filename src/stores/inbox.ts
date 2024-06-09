@@ -3,16 +3,19 @@ import { defineStore } from 'pinia'
 const useInboxStore = defineStore('inbox', {
   state: () => {
     return {
-      // friendRequests: [{request_id: 2, username: 'neki'},{request_id: 1, username: 'test'}] as [FriendRequest],
-      friendRequests: [] as [FriendRequest],
+      // requests: [{request_id: 2, username: 'neki'},{request_id: 1, username: 'test'}] as [FriendRequest],
+      requests: [] as [Request],
       messages: [] as [string],
     }
   },
 })
 
-interface FriendRequest {
+interface Request {
   request_id: number,
   user: UserData,
+  text: String,
+  request_type: String,
+  opponent: number,
 }
 
 interface UserData {
@@ -23,5 +26,5 @@ interface UserData {
 
 export {
   useInboxStore,
-  FriendRequest,
+  Request,
 }

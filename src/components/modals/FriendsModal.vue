@@ -65,8 +65,8 @@ let friends_list = ref([])
 let possible_friends = ref([])
 
 function fetch_data() {
-  axios.get('social/').then(resp => {
-    friends_list.value = resp.data.info
+  axios.get('social/profile').then(resp => {
+    friends_list.value = resp.data.friends
   })
   axios.get('social/possible_friends').then(resp => {
     possible_friends.value = resp.data.info

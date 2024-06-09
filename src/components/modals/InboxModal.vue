@@ -3,13 +3,13 @@
     <h3>Inbox</h3>
     <hr>
     <br>
-    <div v-if="inboxStore.friendRequests.length" class="msg">
-      <div v-for="(req, index) in inboxStore.friendRequests" class="d-flex"
+    <div v-if="inboxStore.requests.length" class="msg">
+      <div v-for="(req, index) in inboxStore.requests" class="d-flex"
         style="justify-content: space-between; align-items: center;">
-        {{ req.user.username }}
+        <span v-html="req.text" />
         <div class="d-flex">
-          <span class="btn" @click="acceptFriend(req, index)">Accept</span>
-          <span class="btn" @click="rejectFriend(req, index)"
+          <span class="btn" @click="acceptRequest(req, index, req.request_type)">Accept</span>
+          <span class="btn" @click="rejectRequest(req, index, req.request_type)"
             style="background-color: red; margin-left:0.3em;">Decline</span>
         </div>
       </div>
@@ -21,36 +21,47 @@
 </template>
 
 <script setup lang="ts">
-import { useInboxStore, FriendRequest } from '../../stores/inbox.ts'
+import { useInboxStore, Request } from '../../stores/inbox.ts'
 import axios from '../../plugins/axios.js'
 
 const inboxStore = useInboxStore()
 
-const { ws } = defineProps<{
-  ws: WebSocket
+const props = defineProps<{
+  ws: WebSocket,
 }>()
 
-function sendFriendToBackend(req: FriendRequest, accept: bool, index: number) {
+function sendRequestToBackend(req: Request, accept: boolean, index: number) {
   console.log("should send")
   axios.post('social/', {
     id: req.user.id,
     request_id: req.request_id,
     msg_type: accept ? 'Accept' : 'Reject',
   }).then(() => {
-    console.log("huh")
-    console.log(inboxStore.friendRequests)
-    inboxStore.friendRequests.splice(index, 1)
-    console.log(inboxStore.friendRequests[index])
-    console.log(inboxStore.friendRequests)
+    inboxStore.requests.splice(index, 1)
   })
 }
 
-function acceptFriend(request: FriendRequest) {
-  sendFriendToBackend(request, true)
+function acceptRequest(request: Request, index: number, type: String) {
+  if (type == "game") {
+    console.log(props)
+    props.ws.send(JSON.stringify({
+      game_id: null,
+      action: 'new_game',
+      data: {
+        game_type: 'Multiplayer',
+        opponent: request.opponent,
+      },
+    }))
+  }
+  else {
+    sendRequestToBackend(request, true, index)
+  }
 }
 
-function rejectFriend(request: FriendRequest) {
-  sendFriendToBackend(request, false)
+function rejectRequest(request: Request, index: number, type: String) {
+  if (type == "friend") {
+    sendRequestToBackend(request, false, index)
+  }
 }
 
 </script>

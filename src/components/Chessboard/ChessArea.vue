@@ -7,7 +7,7 @@
           game</div>
       </div>
       <Chessboard v-else-if="games[current_game] != undefined" :pieces="games[current_game].pieces"
-        @move='processMove' />
+        @move='processMove' :orientation="games[current_game].playing"/>
       <div v-else style="flex: 1;">wrong game selected</div>
       <div class="side-bar">
         <div class="chess-moves scrollable">
@@ -59,8 +59,9 @@
 import Chessboard from './Chessboard.vue'
 import { ref } from 'vue'
 import NewGameModal from '../modals/NewGameModal.vue'
+import EndGameModal from '../modals/EndGameModal.vue'
 import { useNotificationStore } from '../../stores/notification';
-import { openModal } from 'jenesius-vue-modal';
+import { openModal, popModal } from 'jenesius-vue-modal';
 import { useInboxStore } from '../../stores/inbox.ts'
 
 const emit = defineEmits(['new_game'])
@@ -134,6 +135,7 @@ props.ws.onmessage = (msg) => {
   else if (data.action == 'chat') {
     console.log(games.value[data.game_id].chat)
     add_to_chat("Opponent", data.data, data.game_id)
+    console.log(games.value[current_game.value].pieces)
   }
   else if (data.action == 'move info') {
     add_to_moves(data.data, data.game_id)
@@ -148,6 +150,7 @@ props.ws.onmessage = (msg) => {
       moves: [[]], // moves will be added a bit later
       username: data.data.opponent.username,
       ask_draw: data.data.ask_draw,
+      playing: data.data.playing,
     }
     console.log(data.data)
     console.log('data.game_id in ws', data.game_id)
@@ -164,29 +167,35 @@ props.ws.onmessage = (msg) => {
 
     index += 1
   }
-  else if (data.action == 'friend request') {
-    inboxStore.friendRequests.push(data.data)
-    console.log(inboxStore.friendRequests)
+  else if (data.action == 'request') {
+    inboxStore.requests.push(data.data)
+    console.log(inboxStore.requests)
   }
   else if (data.action == 'end') {
-    // TODO: Add popup when game ends
+    let msg;
     if (data.data.type == 'resign') {
-      console.log("opponent resigned")
+      msg = (data.data.win ? "Opponent" : "You") + " resigned"
     }
     else if (data.data.type == 'draw-ask') {
-      console.log("draw ask")
       games.value[current_game.value].ask_draw = data.data.data
     }
     else if (data.data.type == 'draw-confirm') {
-      console.log("draw confirm")
       games.value[current_game.value].ask_draw = undefined
+      msg = "Draw"
     }
     else if (data.data.type == 'draw-cancel') {
-      console.log("draw cancel")
       games.value[current_game.value].ask_draw = undefined
     }
     else if (data.data.type == 'checkmate') {
-      console.log("win")
+      msg = "You " + (data.data.win ? "won" : "lost")
+    }
+
+    if (msg) {
+      let modal = openModal(EndGameModal, { msg })
+      modal.onclose = (_event) => {
+        delete games.value[current_game.value]
+        current_game.value = undefined
+      }
     }
   }
   else {
@@ -194,12 +203,13 @@ props.ws.onmessage = (msg) => {
   }
 }
 
+
 function end_game(type: string) {
   if (!current_game.value) {
     return
   }
 
-  ws.send(JSON.stringify({
+  props.ws.send(JSON.stringify({
     game_id: current_game.value,
     action: "end",
     data: type,
