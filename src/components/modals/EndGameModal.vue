@@ -6,7 +6,7 @@
     <h4>{{ msg }}</h4>
     <br>
 
-    <span class="btn" @click="() => closeModal()">Close</span>
+    <span class="btn" @click="() => close_m()">Close</span>
     <br>
   </div>
 </template>
@@ -17,5 +17,10 @@ import { closeModal } from 'jenesius-vue-modal';
 const { msg, close } = defineProps({
   msg: String,
 });
+
+function close_m() {
+  closeModal()
+  window.location.reload()
+}
 
 </script>

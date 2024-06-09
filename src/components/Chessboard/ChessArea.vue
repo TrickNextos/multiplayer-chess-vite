@@ -168,6 +168,7 @@ props.ws.onmessage = (msg) => {
     index += 1
   }
   else if (data.action == 'request') {
+    console.log("wwow")
     inboxStore.requests.push(data.data)
     console.log(inboxStore.requests)
   }

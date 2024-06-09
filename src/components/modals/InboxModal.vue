@@ -52,6 +52,13 @@ function acceptRequest(request: Request, index: number, type: String) {
         opponent: request.opponent,
       },
     }))
+    axios.post('social/', {
+      id: request.user.id,
+      request_id: request.request_id,
+      msg_type: {DeleteNotification: request.request_id},
+    }).then(() => {
+      inboxStore.requests.splice(index, 1)
+    })
   }
   else {
     sendRequestToBackend(request, true, index)
@@ -61,6 +68,16 @@ function acceptRequest(request: Request, index: number, type: String) {
 function rejectRequest(request: Request, index: number, type: String) {
   if (type == "friend") {
     sendRequestToBackend(request, false, index)
+  }
+  else {
+    console.log("canceled")
+    axios.post('social/', {
+      id: request.user.id,
+      request_id: request.request_id,
+      msg_type: {DeleteNotification: request.request_id},
+    }).then(() => {
+      inboxStore.requests.splice(index, 1)
+    })
   }
 }
 
